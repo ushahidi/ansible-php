@@ -25,13 +25,11 @@
 - name: enable ext-mcrypt
   command: php5enmod mcrypt imap gd json curl mysqlnd
   sudo: true
+  notify: restart php5-fpm
 
 # @todo
 - name: copy extra php config file
   template: src="php-conf.j2" dest=/etc/php5/fpm/conf.d/99-ushahidi.ini
   sudo: true
   tags: nginx
-
-- name: restart php5-fpm
-  service: name=php5-fpm state=restarted enabled=yes
-  sudo: true
+  notify: restart php5-fpm
