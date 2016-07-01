@@ -11,7 +11,9 @@ None
 Dependencies
 ------------
 
-- ushahidi.common
+None.
+
+Works with ushahidi.nginx
 
 Example Playbook
 ----------------
