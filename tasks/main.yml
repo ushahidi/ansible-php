@@ -1,35 +1,5 @@
 ---
-- name: install php and modules
-  apt: name={{ item }} state=latest
-  sudo: true
-  with_items:
-    - php5
-    - php5-cli
-    - php5-curl
-    - php5-gd
-    - php5-mcrypt
-    - php5-imap
-    - php5-json
-    - php5-mysqlnd
-    - php5-memcached
-
-# @todo make conditional
-- name: install php-fpm
-  apt: name=php5-fpm state=latest
-  sudo: true
-
-- name: install memcached
-  apt: name=memcached state=latest
-  sudo: true
-
-- name: enable ext-mcrypt
-  command: php5enmod mcrypt imap gd json curl mysqlnd
-  sudo: true
-  notify: restart php5-fpm
-
-# @todo
-- name: copy extra php config file
-  template: src="php-conf.j2" dest=/etc/php5/fpm/conf.d/99-ushahidi.ini
-  sudo: true
-  tags: nginx
-  notify: restart php5-fpm
+- include: php55.yml
+  when: (php_minor_version == '5.5')
+- include: php56.yml
+  when: (php_minor_version == '5.6')
