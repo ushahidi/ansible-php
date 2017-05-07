@@ -1,4 +1,7 @@
 ---
+- name: Ensure common CA certificates
+  apt: name=ca-certificates state=present
+  
 - name: Add ondrej/php PPA
   apt_repository: repo='ppa:ondrej/php' update_cache=yes
   sudo: true
