@@ -1,2 +1,5 @@
 ---
-php_minor_version: 5.5
+php_minor_version: "5.5"
+
+php_fpm_max_execution_time: 30
+php_fpm_upload_max_filesize: 20M

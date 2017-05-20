@@ -1,49 +1,48 @@
 ---
-- name: Ensure common CA certificates
-  apt: name=ca-certificates state=present
-  
-- name: Add ondrej/php PPA
-  apt_repository: repo='ppa:ondrej/php' update_cache=yes
-  sudo: true
+- block:
+  - name: Ensure common CA certificates
+    apt: name=ca-certificates state=present
+    
+  - name: Add ondrej/php PPA
+    apt_repository: repo='ppa:ondrej/php' update_cache=yes
 
-- name: install php and modules
-  apt: name={{ item }} state=latest
-  sudo: true
-  with_items:
-    - php5.6
-    - php5.6-cli
-    - php5.6-curl
-    - php5.6-gd
-    - php5.6-mcrypt
-    - php5.6-imap
-    - php5.6-json
-    - php5.6-mysqlnd
-    - php5.6-mbstring
-    - php5.6-memcached
-    - php5.6-xml
-    - php5.6-zip
+  - name: install php and modules
+    apt: name={{ item }} state=latest
+    with_items:
+      - php5.6
+      - php5.6-cli
+      - php5.6-curl
+      - php5.6-gd
+      - php5.6-mcrypt
+      - php5.6-imap
+      - php5.6-json
+      - php5.6-mysqlnd
+      - php5.6-mbstring
+      - php5.6-memcached
+      - php5.6-xml
+      - php5.6-zip
 
-# @todo make conditional
-- name: install php-fpm
-  apt: name=php5.6-fpm state=latest
-  sudo: true
+  # @todo make conditional
+  - name: install php-fpm
+    apt: name=php5.6-fpm state=latest
 
-- name: install memcached
-  apt: name=memcached state=latest
-  sudo: true
+  - name: start php5.6-fpm on boot
+    service: name=php5.6-fpm state=started enabled=yes
 
-- name: enable ext-mcrypt
-  command: phpenmod mcrypt imap gd json curl mysqlnd
-  sudo: true
-  notify: restart php5.6-fpm
+  - name: install memcached
+    apt: name=memcached state=latest
 
-# @todo
-- name: copy extra php config file
-  template: src="php-conf.j2" dest=/etc/php/5.6/fpm/conf.d/99-ushahidi.ini
-  sudo: true
-  tags: nginx
-  notify: restart php5.6-fpm
+  - name: enable ext-mcrypt
+    command: phpenmod mcrypt imap gd json curl mysqlnd
+    notify: restart php5.6-fpm
 
-- name: link php-fpm socket to default location
-  file: path=/var/run/php5-fpm.sock src=/var/run/php/php5.6-fpm.sock force=yes state=link 
-  sudo: true
+  - name: copy extra php config file
+    template: src="php-conf.j2" dest=/etc/php/5.6/fpm/conf.d/99-ushahidi.ini
+    tags: nginx
+    notify: restart php5.6-fpm
+
+  - name: link php-fpm socket to default location
+    file: path=/var/run/php5-fpm.sock src=/var/run/php/php5.6-fpm.sock force=yes state=link 
+
+  become: true
+  become_user: root
