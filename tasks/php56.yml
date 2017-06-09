@@ -36,6 +36,14 @@
     command: phpenmod mcrypt imap gd json curl mysqlnd
     notify: restart php5.6-fpm
 
+  - name: tweak php-fpm pool parameters
+    lineinfile:
+      dest: /etc/php/5.6/fpm/pool.d/www.conf
+      regexp: '^([#;]+\s*)?{{ item.key }}\s*=.*$'
+      line: "{{ item.key }} = {{ item.value }}"
+      state: present
+    with_dict: "{{ php_fpm_pool_config | combine(php_fpm_pool_config_overrides) }}"
+
   - name: copy extra php config file
     template: src="php-conf.j2" dest=/etc/php/5.6/fpm/conf.d/99-ushahidi.ini
     tags: nginx

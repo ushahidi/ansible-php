@@ -1,0 +1,18 @@
+---
+dependency:
+  name: galaxy
+driver:
+  name: docker
+lint:
+  name: ansible-lint
+platforms:
+  - name: ansible_php_default
+    image: molecule_local/ansible_php_default
+    command: sleep infinity
+    dockerfile: Dockerfile
+provisioner:
+  name: ansible
+scenario:
+  name: default
+verifier:
+  name: testinfra
