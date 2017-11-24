@@ -7,8 +7,10 @@ lint:
   name: yamllint
   enabled: False
 platforms:
-  - name: ansible_php_test_instance
+  - name: ansible_php_trusty
     image: ubuntu:trusty
+  - name: ansible_php_xenial
+    image: ubuntu:xenial
 provisioner:
   name: ansible
   lint:
