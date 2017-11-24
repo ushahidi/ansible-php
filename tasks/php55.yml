@@ -1,7 +1,7 @@
 ---
 - block:
   - name: install php and modules
-    apt: name={{ item }} state=latest
+    apt: name={{ item }} state=present
     with_items:
       - php5
       - php5-cli
@@ -15,13 +15,13 @@
 
   # @todo make conditional
   - name: install php-fpm
-    apt: name=php5-fpm state=latest
+    apt: name=php5-fpm state=present
 
   - name: start php5-fpm on boot
     service: name=php5-fpm state=started enabled=yes
 
   - name: install memcached
-    apt: name=memcached state=latest
+    apt: name=memcached state=present
 
   - name: enable ext-mcrypt
     command: php5enmod mcrypt imap gd json curl mysqlnd

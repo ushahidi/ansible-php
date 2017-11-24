@@ -2,12 +2,12 @@
 - block:
   - name: Ensure common CA certificates
     apt: name=ca-certificates state=present
-    
+
   - name: Add ondrej/php PPA
     apt_repository: repo='ppa:ondrej/php' update_cache=yes
 
   - name: install php and modules
-    apt: name={{ item }} state=latest
+    apt: name={{ item }} state=present
     with_items:
       - php5.6
       - php5.6-cli
@@ -24,13 +24,13 @@
 
   # @todo make conditional
   - name: install php-fpm
-    apt: name=php5.6-fpm state=latest
+    apt: name=php5.6-fpm state=present
 
   - name: start php5.6-fpm on boot
     service: name=php5.6-fpm state=started enabled=yes
 
   - name: install memcached
-    apt: name=memcached state=latest
+    apt: name=memcached state=present
 
   - name: enable ext-mcrypt
     command: phpenmod mcrypt imap gd json curl mysqlnd
@@ -50,7 +50,7 @@
     notify: restart php5.6-fpm
 
   - name: link php-fpm socket to default location
-    file: path=/var/run/php5-fpm.sock src=/var/run/php/php5.6-fpm.sock force=yes state=link 
+    file: path=/var/run/php5-fpm.sock src=/var/run/php/php5.6-fpm.sock force=yes state=link
 
   become: true
   become_user: root

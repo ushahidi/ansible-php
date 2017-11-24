@@ -1,5 +1,6 @@
 ---
-- hosts: all
+- name: Converge
+  hosts: all
   roles:
     - role: ansible-php
       php_minor_version: "5.6"
