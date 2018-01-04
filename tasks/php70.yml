@@ -1,0 +1,56 @@
+---
+- block:
+  - name: Ensure common CA certificates
+    apt: name=ca-certificates state=present
+
+  - name: Add ondrej/php PPA
+    apt_repository: repo='ppa:ondrej/php' update_cache=yes
+
+  - name: install php and modules
+    apt: name={{ item }} state=present
+    with_items:
+      - php7.0
+      - php7.0-cli
+      - php7.0-curl
+      - php7.0-gd
+      - php7.0-mcrypt
+      - php7.0-imap
+      - php7.0-json
+      - php7.0-mysqlnd
+      - php7.0-mbstring
+      - php7.0-memcached
+      - php7.0-xml
+      - php7.0-zip
+
+  # @todo make conditional
+  - name: install php-fpm
+    apt: name=php7.0-fpm state=present
+
+  - name: start php7.0-fpm on boot
+    service: name=php7.0-fpm state=started enabled=yes
+
+  - name: install memcached
+    apt: name=memcached state=present
+
+  - name: enable ext-mcrypt
+    command: phpenmod mcrypt imap gd json curl mysqlnd
+    notify: restart php7.0-fpm
+
+  - name: tweak php-fpm pool parameters
+    lineinfile:
+      dest: /etc/php/7.0/fpm/pool.d/www.conf
+      regexp: '^([#;]+\s*)?{{ item.key }}\s*=.*$'
+      line: "{{ item.key }} = {{ item.value }}"
+      state: present
+    with_dict: "{{ php_fpm_pool_config | combine(php_fpm_pool_config_overrides) }}"
+
+  - name: copy extra php config file
+    template: src="php-conf.j2" dest=/etc/php/7.0/fpm/conf.d/99-ushahidi.ini
+    tags: nginx
+    notify: restart php7.0-fpm
+
+  - name: link php-fpm socket to default location
+    file: path=/var/run/php5-fpm.sock src=/var/run/php/php7.0-fpm.sock force=yes state=link
+
+  become: true
+  become_user: root
