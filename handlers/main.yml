@@ -8,3 +8,8 @@
   service: name=php5.6-fpm state=restarted enabled=yes
   become: true
   become_user: root
+
+- name: restart php7.0-fpm
+  service: name=php7.0-fpm state=restarted enabled=yes
+  become: true
+  become_user: root
