@@ -7,3 +7,9 @@
   when: (php_minor_version == '7.0')
 - include_tasks: php72.yml
   when: (php_minor_version == '7.2')
+
+- name: install composer
+  shell: curl -sS https://getcomposer.org/installer | sudo php -- --install-dir=/usr/local/bin --filename=composer
+  args:
+    creates: /usr/local/bin/composer
+  become: false

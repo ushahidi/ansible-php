@@ -36,6 +36,9 @@
     command: phpenmod imap gd json curl mysqlnd  # mcrypt deprecated in 7.2
     notify: restart php7.2-fpm
 
+  - name: select appropriate php version
+    alternatives: name=php path=/usr/bin/php7.2
+
   - name: tweak php-fpm pool parameters
     lineinfile:
       dest: /etc/php/7.2/fpm/pool.d/www.conf

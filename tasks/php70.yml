@@ -36,6 +36,9 @@
     command: phpenmod mcrypt imap gd json curl mysqlnd
     notify: restart php7.0-fpm
 
+  - name: select appropriate php version
+    alternatives: name=php path=/usr/bin/php7.0
+
   - name: tweak php-fpm pool parameters
     lineinfile:
       dest: /etc/php/7.0/fpm/pool.d/www.conf
