@@ -1,5 +1,8 @@
 ---
 - block:
+  - name: set fact with name of php-fpm service
+    set_fact: php_fpm_service_name=php7.0-fpm
+
   - name: Ensure common CA certificates
     apt: name=ca-certificates state=present
 
@@ -28,14 +31,14 @@
     apt: name=php7.0-fpm state=present
 
   - name: start php7.0-fpm on boot
-    service: name=php7.0-fpm state=started enabled=yes
+    service: name={{ php_fpm_service_name }} state=started enabled=yes
 
   - name: install memcached
     apt: name=memcached state=present
 
   - name: enable ext-mcrypt
     command: phpenmod mcrypt imap gd json curl mysqlnd
-    notify: restart php7.0-fpm
+    notify: restart php-fpm
 
   - name: select appropriate php version
     alternatives: name=php path=/usr/bin/php7.0
@@ -50,11 +53,13 @@
 
   - name: copy extra php config file
     template: src="php-conf.j2" dest=/etc/php/7.0/fpm/conf.d/99-ushahidi.ini
-    tags: nginx
-    notify: restart php7.0-fpm
+    notify: restart php-fpm
 
   - name: link php-fpm socket to default location
-    file: path=/var/run/php5-fpm.sock src=/var/run/php/php7.0-fpm.sock force=yes state=link
+    file: path={{ item }} src=/var/run/php/php7.0-fpm.sock force=yes state=link
+    with_items:
+      - /var/run/php5-fpm.sock
+      - /var/run/php-fpm.sock
 
   become: true
   become_user: root
