@@ -1,0 +1,45 @@
+---
+- block:
+  - name: set fact with name of php-fpm service
+    set_fact: php_fpm_service_name=php5-fpm
+
+  - name: install php and modules
+    apt: name={{ item }} state=present
+    with_items:
+      - php5
+      - php5-cli
+      - php5-curl
+      - php5-gd
+      - php5-mcrypt
+      - php5-imap
+      - php5-json
+      - php5-mysqlnd
+      - php5-memcached
+
+  # @todo make conditional
+  - name: install php-fpm
+    apt: name={{ php_fpm_service_name }} state=present
+
+  - name: start php5-fpm on boot
+    service: name={{ php_fpm_service_name }} state=started enabled=yes
+
+  - name: install memcached
+    apt: name=memcached state=present
+
+  - name: enable ext-mcrypt
+    command: php5enmod mcrypt imap gd json curl mysqlnd
+    notify: restart php-fpm
+
+  # @todo
+  - name: copy extra php config file
+    template: src="php-conf.j2" dest=/etc/php5/fpm/conf.d/99-ushahidi.ini
+    tags: nginx
+    notify: restart php-fpm
+
+  - name: link php-fpm socket to default location
+    file: path={{ item }} src=/var/run/php/php5-fpm.sock force=yes state=link
+    with_items:
+      - /var/run/php-fpm.sock
+
+  become: true
+  become_user: root
