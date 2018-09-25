@@ -1,7 +1,9 @@
 ---
-- fail: msg="unsupported vesion {{ php_minor_version }}"
+- fail: msg="unsupported version {{ php_minor_version }}"
   when: php_minor_version not in php_role_supported_versions
 
+- include_tasks: php53.yml
+  when: (php_minor_version == '5.3')
 - include_tasks: php55.yml
   when: (php_minor_version == '5.5')
 - include_tasks: php56.yml
