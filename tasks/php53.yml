@@ -28,6 +28,7 @@
       - php53-mod-mysqlnd
       - php53-mod-mbstring
       - php53-mod-memcached
+      - php53-mod-simplexml
       - php53-mod-xml
       - php53-mod-zip
       - php53-phar
@@ -53,7 +54,7 @@
     apt: name=memcached state=present
 
   - name: enable extensions
-    command: php53-modset -e mcrypt imap gd json curl 04-mysqlnd 02-mbstring mysql -v
+    command: php53-modset -e mcrypt imap gd json curl 04-mysqlnd 02-mbstring mysql simplexml -v
     notify: restart php-fpm
 
   - name: select appropriate php version
