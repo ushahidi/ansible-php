@@ -54,7 +54,7 @@
     apt: name=memcached state=present
 
   - name: enable extensions
-    command: php53-modset -e mcrypt imap gd json curl 04-mysqlnd 02-mbstring mysql simplexml -v
+    command: php53-modset -e mcrypt imap gd json curl 04-mysqlnd 02-mbstring mysql mysqli simplexml -v
     notify: restart php-fpm
 
   - name: select appropriate php version
