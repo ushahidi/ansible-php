@@ -7,18 +7,18 @@ lint:
   name: yamllint
   enabled: False
 platforms:
-  - name: ansible_php70_trusty
+  - name: ansible_php71_trusty
     image: ubuntu:trusty
-  - name: ansible_php70_xenial
+  - name: ansible_php71_xenial
     image: ubuntu:xenial
-  - name: ansible_php70_bionic
+  - name: ansible_php71_bionic
     image: ubuntu:bionic
 provisioner:
   name: ansible
   lint:
     name: ansible-lint
 scenario:
-  name: php70
+  name: php71
 verifier:
   name: testinfra
   lint:

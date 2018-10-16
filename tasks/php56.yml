@@ -3,8 +3,11 @@
   - name: set fact with name of php-fpm service
     set_fact: php_fpm_service_name=php5.6-fpm
 
-  - name: Ensure common CA certificates
-    apt: name=ca-certificates state=present
+  - name: Install dependencies for PPA
+    apt: name={{ item }} state=present
+    with_items:
+      - ca-certificates
+      - software-properties-common
 
   - name: Add ondrej/php PPA
     apt_repository: repo='ppa:ondrej/php' update_cache=yes
@@ -22,7 +25,7 @@
       - php5.6-json
       - php5.6-mysqlnd
       - php5.6-mbstring
-      - php5.6-memcached
+      - php-memcached
       - php5.6-xml
       - php5.6-zip
 

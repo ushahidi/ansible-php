@@ -11,6 +11,8 @@ platforms:
     image: ubuntu:trusty
   - name: ansible_php72_xenial
     image: ubuntu:xenial
+  - name: ansible_php72_bionic
+    image: ubuntu:bionic
 provisioner:
   name: ansible
   lint:

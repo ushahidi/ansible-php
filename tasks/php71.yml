@@ -1,7 +1,7 @@
 ---
 - block:
   - name: set fact with name of php-fpm service
-    set_fact: php_fpm_service_name=php7.2-fpm
+    set_fact: php_fpm_service_name=php7.1-fpm
 
   - name: Install dependencies for PPA
     apt: name={{ item }} state=present
@@ -15,52 +15,51 @@
   - name: install php and modules
     apt: name={{ item }} state=present
     with_items:
-      - php7.2
-      - php7.2-cli
-      - php7.2-bcmath
-      - php7.2-curl
-      - php7.2-gd
-      - php7.2-imap
-      - php7.2-json
-      - php7.2-mysqlnd
-      - php7.2-mbstring
+      - php7.1
+      - php7.1-cli
+      - php7.1-bcmath
+      - php7.1-curl
+      - php7.1-gd
+      - php7.1-mcrypt
+      - php7.1-imap
+      - php7.1-json
+      - php7.1-mysqlnd
+      - php7.1-mbstring
       - php-memcached
-      - php7.2-xml
-      - php7.2-zip
-      # - mcrypt deprecated in 7.2
+      - php7.1-xml
+      - php7.1-zip
 
   # @todo make conditional
   - name: install php-fpm
-    apt: name=php7.2-fpm state=present
+    apt: name=php7.1-fpm state=present
 
-  - name: start php7.2-fpm on boot
+  - name: start php7.1-fpm on boot
     service: name={{ php_fpm_service_name }} state=started enabled=yes
 
   - name: install memcached
     apt: name=memcached state=present
 
-  - name: enable extensions
-    command: phpenmod imap gd json curl mysqlnd  # mcrypt deprecated in 7.2
-    notify: restart php7.2-fpm
+  - name: enable ext-mcrypt
+    command: phpenmod mcrypt imap gd json curl mysqlnd
+    notify: restart php-fpm
 
   - name: select appropriate php version
-    alternatives: name=php path=/usr/bin/php7.2
+    alternatives: name=php path=/usr/bin/php7.1
 
   - name: tweak php-fpm pool parameters
     lineinfile:
-      dest: /etc/php/7.2/fpm/pool.d/www.conf
+      dest: /etc/php/7.1/fpm/pool.d/www.conf
       regexp: '^([#;]+\s*)?{{ item.key }}\s*=.*$'
       line: "{{ item.key }} = {{ item.value }}"
       state: present
     with_dict: "{{ php_fpm_pool_config | combine(php_fpm_pool_config_overrides) }}"
 
   - name: copy extra php config file
-    template: src="php-conf.j2" dest=/etc/php/7.2/fpm/conf.d/99-ushahidi.ini
-    tags: nginx
+    template: src="php-conf.j2" dest=/etc/php/7.1/fpm/conf.d/99-ushahidi.ini
     notify: restart php-fpm
 
   - name: link php-fpm socket to default location
-    file: path={{ item }} src=/var/run/php/php7.2-fpm.sock force=yes state=link
+    file: path={{ item }} src=/var/run/php/php7.1-fpm.sock force=yes state=link
     with_items:
       - /var/run/php5-fpm.sock
       - /var/run/php-fpm.sock
