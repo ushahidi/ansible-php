@@ -1,0 +1,82 @@
+---
+- block:
+  - name: set fact with name of php-fpm service
+    set_fact: php_fpm_service_name=php53-fpm
+
+  - name: Ensure common CA certificates
+    apt: name=ca-certificates state=present
+
+  - name: Add ondrej/php PPA
+    apt_repository: repo='ppa:sergey-dryabzhinsky/packages' update_cache=yes
+
+  - name: Add ondrej/php PPA
+    apt_repository: repo='ppa:sergey-dryabzhinsky/php53' update_cache=yes
+
+  - name: Add ondrej/php PPA
+    apt_repository: repo='ppa:sergey-dryabzhinsky/php-modules' update_cache=yes
+
+  - name: install php and modules
+    apt: name={{ item }} state=present
+    with_items:
+      - php53-cli
+      - php53-mod-bcmath
+      - php53-mod-curl
+      - php53-mod-gd
+      - php53-mod-mcrypt
+      - php53-mod-imap
+      - php53-mod-json
+      - php53-mod-mysqlnd
+      - php53-mod-mbstring
+      - php53-mod-memcached
+      - php53-mod-simplexml
+      - php53-mod-xml
+      - php53-mod-zip
+      - php53-phar
+
+  # @todo make conditional
+  - name: install php-fpm
+    apt: name=php53-fpm state=present
+
+  - name: copy php fpm pool config file
+    template: src="php53-www-pool.conf.j2" dest=/etc/php53/fpm/pool.d/www.conf
+    notify: restart php-fpm
+
+  - name: enable php-fpm in defaults
+    lineinfile:
+      dest: /etc/default/php53-fpm
+      line: "ENABLE=true"
+      state: present
+
+  - name: start php53-fpm on boot
+    service: name={{ php_fpm_service_name }} state=started enabled=yes
+
+  - name: install memcached
+    apt: name=memcached state=present
+
+  - name: enable extensions
+    command: php53-modset -e mcrypt imap gd json curl 04-mysqlnd 02-mbstring mysql mysqli simplexml -v
+    notify: restart php-fpm
+
+  - name: select appropriate php version
+    alternatives: name=php path=/usr/bin/php53
+
+  - name: tweak php-fpm pool parameters
+    lineinfile:
+      dest: /etc/php53/fpm/pool.d/www.conf
+      regexp: '^([#;]+\s*)?{{ item.key }}\s*=.*$'
+      line: "{{ item.key }} = {{ item.value }}"
+      state: present
+    with_dict: "{{ php_fpm_pool_config | combine(php_fpm_pool_config_overrides) }}"
+
+  - name: copy extra php config file
+    template: src="php-conf.j2" dest=/etc/php53/fpm/conf.d/99-ushahidi.ini
+    notify: restart php-fpm
+
+  - name: link php-fpm socket to default location
+    file: path={{ item }} src=/var/run/php53-fpm.sock force=yes state=link
+    with_items:
+      - /var/run/php5-fpm.sock
+      - /var/run/php-fpm.sock
+
+  become: true
+  become_user: root

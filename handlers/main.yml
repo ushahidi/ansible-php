@@ -3,7 +3,12 @@
   service: name={{ php_fpm_service_name }} state=restarted enabled=yes
   become: true
   become_user: root
-  
+
+- name: restart php53-fpm
+  service: name=php53-fpm state=restarted enabled=yes
+  become: true
+  become_user: root
+
 - name: restart php5.6-fpm
   service: name=php5.6-fpm state=restarted enabled=yes
   become: true
