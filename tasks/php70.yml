@@ -25,9 +25,10 @@
       - php7.0-json
       - php7.0-mysqlnd
       - php7.0-mbstring
-      - php-memcached
       - php7.0-xml
       - php7.0-zip
+      - php-memcache
+      - php-memcached
 
   # @todo make conditional
   - name: install php-fpm
