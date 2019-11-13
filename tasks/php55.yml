@@ -40,6 +40,7 @@
     file: path={{ item }} src=/var/run/php/php5-fpm.sock force=yes state=link
     with_items:
       - /var/run/php-fpm.sock
+      - /etc/php/php-fpm.sock
 
   become: true
   become_user: root

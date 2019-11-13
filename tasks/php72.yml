@@ -60,11 +60,12 @@
     tags: nginx
     notify: restart php-fpm
 
-  - name: link php-fpm socket to default location
+  - name: link php-fpm socket to other locations
     file: path={{ item }} src=/var/run/php/php7.2-fpm.sock force=yes state=link
     with_items:
       - /var/run/php5-fpm.sock
       - /var/run/php-fpm.sock
+      - /etc/php/php-fpm.sock
 
   become: true
   become_user: root

@@ -63,6 +63,7 @@
     with_items:
       - /var/run/php5-fpm.sock
       - /var/run/php-fpm.sock
+      - /etc/php/php-fpm.sock
 
   become: true
   become_user: root
